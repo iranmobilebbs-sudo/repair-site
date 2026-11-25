@@ -84,6 +84,7 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
     <div><label for="f-cost">هزینه (تومان)</label><input id="f-cost" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" autocomplete="off"></div>
     <div><label for="f-dep">بیعانه (تومان)</label><input id="f-dep" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" autocomplete="off"></div>
   </div>
+  <label for="f-pass">رمز گوشی (پین یا الگو)</label><input id="f-pass" dir="ltr" style="text-align:right" autocomplete="off">
   <label for="f-status">وضعیت</label>
   <select id="f-status"></select>
   <datalist id="dl-phone"></datalist><datalist id="dl-model"></datalist>
@@ -181,7 +182,7 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
     $('list').innerHTML=res.map(function(it){
       var opts=ST.map(function(s,i){return '<option value="'+i+'"'+(it.status===i?' selected':'')+'>'+s+'</option>'}).join('');
       return '<div class="item"><div class="top"><div><div class="name">'+hl(it.phone+' '+it.model,terms)+'</div><div class="meta">'+hl(it.owner,terms)+(it.mobile?' - <span dir="ltr">'+hl(it.mobile,terms)+'</span>':'')+'</div></div><div class="code">'+hl(it.code,terms)+'</div></div>'+
-      (it.problem?'<div class="prob">'+hl(it.problem,terms)+'</div>':'')+
+      (it.problem?'<div class="prob">'+hl(it.problem,terms)+'</div>':'')+(it.pass?'<div class="meta">رمز: <span dir="ltr">'+esc(it.pass)+'</span></div>':'')+
       (it.cost||it.dep?'<div class="meta">'+[it.cost?'هزینه '+fm(it.cost):'',it.dep?'بیعانه '+fm(it.dep):'',it.cost?'باقی‌مانده '+fm(Math.max(0,it.cost-(it.dep||0))):''].filter(Boolean).join(' | ')+' تومان</div>':'')+
       '<div class="row2"><select class="st st'+(it.status+1)+'" data-s="'+it.code+'" aria-label="وضعیت">'+opts+'</select><span class="date">ثبت: '+fdate(it.created)+'</span></div>'+(it.delivered?'<div class="date">تحویل: '+fdate(it.delivered)+'</div>':'')+
       '<div class="acts"><button class="link" data-e="'+it.code+'">ویرایش</button></div></div>'
@@ -198,7 +199,7 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
   function openDlg(it){
     editCode=it?it.code:null;$('err').textContent='';
     $('dt').textContent=it?'ویرایش - کد '+it.code:'ثبت گوشی جدید';
-    $('f-phone').value=it?it.phone:'';$('f-model').value=it?it.model:'';$('f-owner').value=it?it.owner:'';$('f-mobile').value=it?it.mobile:'';$('f-prob').value=it?it.problem:'';$('f-cost').value=it&&it.cost?Number(it.cost).toLocaleString('en-US'):'';$('f-dep').value=it&&it.dep?Number(it.dep).toLocaleString('en-US'):'';
+    $('f-phone').value=it?it.phone:'';$('f-model').value=it?it.model:'';$('f-owner').value=it?it.owner:'';$('f-mobile').value=it?it.mobile:'';$('f-prob').value=it?it.problem:'';$('f-pass').value=it&&it.pass?it.pass:'';$('f-cost').value=it&&it.cost?Number(it.cost).toLocaleString('en-US'):'';$('f-dep').value=it&&it.dep?Number(it.dep).toLocaleString('en-US'):'';
     $('f-status').innerHTML=ST.map(function(s,i){return '<option value="'+i+'">'+s+'</option>'}).join('');
     $('f-status').value=it?it.status:0;
     fillSug();$('dlg').showModal();$('f-phone').focus()
@@ -209,7 +210,7 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
   $('save').onclick=function(){
     var phone=$('f-phone').value.trim(),owner=$('f-owner').value.trim();
     if(!phone||!owner){$('err').textContent='اسم گوشی و اسم صاحب گوشی را وارد کنید.';return}
-    var now=Date.now(),vals={phone:phone,model:$('f-model').value.trim(),owner:owner,mobile:norm($('f-mobile').value).trim(),problem:$('f-prob').value.trim(),cost:digits($('f-cost').value),dep:digits($('f-dep').value),status:+$('f-status').value,updated:now};
+    var now=Date.now(),vals={phone:phone,model:$('f-model').value.trim(),owner:owner,mobile:norm($('f-mobile').value).trim(),problem:$('f-prob').value.trim(),pass:$('f-pass').value.trim(),cost:digits($('f-cost').value),dep:digits($('f-dep').value),status:+$('f-status').value,updated:now};
     if(editCode){items=items.map(function(i){return i.code===editCode?Object.assign({},i,vals,delivFor(i,vals.status,now)):i});persist();$('dlg').close();render()}
     else{vals.code=newCode();vals.created=now;Object.assign(vals,delivFor({},vals.status,now));items.push(vals);
       if(persist()){$('dlg').close();$('newcode').textContent=vals.code;$('done').showModal();render()}}
