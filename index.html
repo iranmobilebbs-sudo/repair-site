@@ -46,13 +46,14 @@ button{font:inherit;cursor:pointer}
 .btn.danger{background:var(--s5);color:#fff}
 .fab{position:fixed;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 14px rgba(0,0,0,.25);border-radius:999px;padding:13px 22px}
 dialog{border:0;border-radius:16px;padding:18px;width:min(520px,94vw);background:var(--card);color:var(--ink)}
-dialog.big{width:min(640px,96vw);max-height:92vh;overflow:auto}
+dialog.wide{width:min(640px,96vw);max-height:92vh;overflow:auto}
 dialog::backdrop{background:rgba(0,0,0,.5)}
 label{display:block;font-weight:600;margin:10px 0 4px;font-size:.9rem}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .bar{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .empty{text-align:center;color:var(--mute);padding:40px 10px}
-.big{direction:ltr;text-align:center;font-size:2.4rem;font-weight:800;letter-spacing:.2em;color:var(--acc);margin:14px 0}
+.bigcode{direction:ltr;text-align:center;font-size:2.4rem;font-weight:800;letter-spacing:.2em;color:var(--acc);margin:14px 0}
+.tabs{scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
 .chip2{border:1.5px solid var(--line);border-radius:8px;padding:0 8px;font-size:.8rem;margin-inline-start:6px}
 .ok{color:var(--s3)}.off{color:var(--s5)}
 mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
@@ -117,7 +118,7 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
 
 <dialog id="done">
   <div style="font-weight:800">ثبت شد. کد پیگیری:</div>
-  <div class="big" id="newcode"></div>
+  <div class="bigcode" id="newcode"></div>
   <div class="bar">
     <button class="btn" id="copy">کپی کد</button>
     <button class="btn alt" id="close2">بستن</button>
@@ -134,7 +135,7 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
   <div class="bar"><button class="btn" id="g-save">ذخیره و همگام‌سازی</button><button class="btn alt" id="g-close">بستن</button></div>
 </dialog>
 
-<dialog id="adm" class="big">
+<dialog id="adm" class="wide">
   <div class="top"><div style="font-weight:800;font-size:1.2rem">پنل مدیریت</div><button class="btn alt" id="adm-close">بستن</button></div>
   <div class="tabs" id="adm-tabs"></div>
   <div id="adm-body"></div>
