@@ -11,14 +11,18 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171c;--card:#19232b;--ink:#e8eef2;--mute:#97a6b1;--line:#2b3a45;--acc:#4cb8d6;--accink:#06222c;--hit:#3b3310;--warn:#4a3d10;--s1:#f0b94a;--s2:#4cb8d6;--s3:#62d08a;--s4:#97a6b1;--s5:#ff8a80}}
 :root[data-theme="dark"]{--bg:#10171c;--card:#19232b;--ink:#e8eef2;--mute:#97a6b1;--line:#2b3a45;--acc:#4cb8d6;--accink:#06222c;--hit:#3b3310;--warn:#4a3d10;--s1:#f0b94a;--s2:#4cb8d6;--s3:#62d08a;--s4:#97a6b1;--s5:#ff8a80}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7}
 .wrap{max-width:640px;margin:0 auto;padding:16px}
 h1{font-size:1.5rem;font-weight:800;margin:4px 0 12px}
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.who{font-size:.9rem;color:var(--mute);display:flex;gap:12px;align-items:center}
 .search{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0 4px}
 input,textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+input[type=checkbox]{width:auto}
 input:focus,textarea:focus,select:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
-.filters{display:flex;gap:6px;overflow-x:auto;padding:6px 0 4px}
+.filters,.tabs{display:flex;gap:6px;overflow-x:auto;padding:6px 0 4px}
 .f{flex:none;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:3px 13px;font-size:.88rem}
 .f.on{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 .count{color:var(--mute);font-size:.85rem;margin:6px 2px}
@@ -33,40 +37,56 @@ input:focus,textarea:focus,select:focus,button:focus-visible{outline:3px solid v
 .st{font-weight:600;font-size:.9rem;border-radius:8px;border:1.5px solid currentColor;background:transparent;padding:2px 8px;width:auto}
 .st1{color:var(--s1)}.st2{color:var(--s2)}.st3{color:var(--s3)}.st4{color:var(--s4)}.st5{color:var(--s5)}
 .date{color:var(--mute);font-size:.8rem}
-.acts{display:flex;gap:14px;margin-top:6px}
+.acts{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
 button{font:inherit;cursor:pointer}
 .link{background:none;border:0;color:var(--acc);padding:2px 0;font-weight:600}
+.link.del{color:var(--s5)}
 .btn{background:var(--acc);color:var(--accink);border:0;border-radius:10px;padding:11px 16px;font-weight:800}
 .btn.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.danger{background:var(--s5);color:#fff}
 .fab{position:fixed;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 14px rgba(0,0,0,.25);border-radius:999px;padding:13px 22px}
 dialog{border:0;border-radius:16px;padding:18px;width:min(520px,94vw);background:var(--card);color:var(--ink)}
+dialog.big{width:min(640px,96vw);max-height:92vh;overflow:auto}
 dialog::backdrop{background:rgba(0,0,0,.5)}
 label{display:block;font-weight:600;margin:10px 0 4px;font-size:.9rem}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .bar{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .empty{text-align:center;color:var(--mute);padding:40px 10px}
-.tools{display:flex;gap:8px;margin:18px 0 90px;flex-wrap:wrap}
 .big{direction:ltr;text-align:center;font-size:2.4rem;font-weight:800;letter-spacing:.2em;color:var(--acc);margin:14px 0}
+.chip2{border:1.5px solid var(--line);border-radius:8px;padding:0 8px;font-size:.8rem;margin-inline-start:6px}
+.ok{color:var(--s3)}.off{color:var(--s5)}
 mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
-.err{color:#b3261e;font-size:.85rem;min-height:1.2em}
+.err{color:var(--s5);font-size:.85rem;min-height:1.2em}
+.pad{height:90px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>پذیرش تعمیرات گوشی</h1>
-  <div class="search"><input id="q" type="search" placeholder="جستجو: کد، اسم گوشی، صاحب، شماره یا مشکل" autocomplete="off"></div>
-  <div class="filters" id="filters"></div>
-  <div id="bk"></div>
-  <div class="count" id="count"></div><div class="count" id="syncst"></div>
-  <div id="list"></div>
-  <div class="tools">
-    <button class="btn alt" id="exp">پشتیبان‌گیری (ذخیره فایل)</button>
-    <button class="btn alt" id="imp">بازیابی از فایل</button>
-    <button class="btn alt" id="setb">همگام‌سازی GitHub</button>
-    <input type="file" id="file" accept=".json,application/json" hidden>
+
+<div id="login" hidden>
+  <div class="wrap">
+    <h1>پذیرش تعمیرات گوشی</h1>
+    <div class="item" id="lbox"></div>
+    <button class="link" id="l-gh">اتصال دستگاه جدید به GitHub</button>
   </div>
 </div>
-<button class="btn fab" id="add">+ ثبت گوشی</button>
+
+<div id="app" hidden>
+  <div class="wrap">
+    <div class="hdr">
+      <h1>پذیرش تعمیرات گوشی</h1>
+      <div class="who"><span id="who"></span><button class="link" id="adm-open" hidden>مدیریت</button><button class="link" id="logout">خروج</button></div>
+    </div>
+    <div class="search"><input id="q" type="search" placeholder="جستجو: کد، اسم گوشی، صاحب، شماره یا مشکل" autocomplete="off"></div>
+    <div class="filters" id="filters"></div>
+    <div id="bk"></div>
+    <div class="count" id="count"></div>
+    <div class="count" id="syncst"></div>
+    <div id="list"></div>
+    <div class="pad"></div>
+  </div>
+  <button class="btn fab" id="add">+ ثبت گوشی</button>
+</div>
+<input type="file" id="file" accept=".json,application/json" hidden>
 
 <dialog id="dlg">
   <div id="dt" style="font-weight:800;font-size:1.1rem">ثبت گوشی جدید</div>
@@ -95,6 +115,15 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
   </div>
 </dialog>
 
+<dialog id="done">
+  <div style="font-weight:800">ثبت شد. کد پیگیری:</div>
+  <div class="big" id="newcode"></div>
+  <div class="bar">
+    <button class="btn" id="copy">کپی کد</button>
+    <button class="btn alt" id="close2">بستن</button>
+  </div>
+</dialog>
+
 <dialog id="gh">
   <div style="font-weight:800;font-size:1.1rem">همگام‌سازی با GitHub</div>
   <label for="g-owner">نام کاربری GitHub</label><input id="g-owner" dir="ltr" style="text-align:left" autocomplete="off">
@@ -105,90 +134,151 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
   <div class="bar"><button class="btn" id="g-save">ذخیره و همگام‌سازی</button><button class="btn alt" id="g-close">بستن</button></div>
 </dialog>
 
-<dialog id="done">
-  <div style="font-weight:800">ثبت شد. کد پیگیری:</div>
-  <div class="big" id="newcode"></div>
-  <div class="bar">
-    <button class="btn" id="copy">کپی کد</button>
-    <button class="btn alt" id="close2">بستن</button>
-  </div>
+<dialog id="adm" class="big">
+  <div class="top"><div style="font-weight:800;font-size:1.2rem">پنل مدیریت</div><button class="btn alt" id="adm-close">بستن</button></div>
+  <div class="tabs" id="adm-tabs"></div>
+  <div id="adm-body"></div>
+</dialog>
+
+<dialog id="ud">
+  <div style="font-weight:800;font-size:1.1rem" id="ud-t"></div>
+  <label for="u-name">نام کاربری (حداقل ۳ حرف، بدون فاصله)</label><input id="u-name" dir="ltr" style="text-align:left" autocomplete="off">
+  <label for="u-pass" id="u-pl">رمز عبور (حداقل ۶ کاراکتر)</label><input id="u-pass" dir="ltr" style="text-align:left" autocomplete="off">
+  <label for="u-role">سمت در سایت</label>
+  <select id="u-role"><option value="staff">کارمند (ثبت و ویرایش)</option><option value="admin">مدیر (همه‌چیز)</option></select>
+  <label><input type="checkbox" id="u-act"> حساب فعال باشد</label>
+  <div class="err" id="u-err"></div>
+  <div class="bar"><button class="btn" id="u-save">ذخیره</button><button class="btn alt" id="u-cancel">انصراف</button></div>
 </dialog>
 
 <script>
 (function(){
-  var KEY='repair-intake-v2', BK='repair-intake-lastbackup2';
+  var K_I='repair-intake-v2',K_M='repair-intake-meta',K_S='repair-intake-ses',K_D='repair-intake-dev',GH='repair-intake-gh',BK='repair-intake-lastbackup2';
   var ST=['تحویل گرفته شد','در حال تعمیر','آماده تحویل','تحویل داده شد','تعمیر نشد'];
-  var items=[], editCode=null, flt=-1;
+  var BR={'Samsung':['Galaxy A03','A04','A05','A14','A15','A24','A25','A34','A35','A54','A55','S21','S22','S23','S24','J7','Note 10','Note 20'],'Apple':['iPhone 7','iPhone 8','iPhone X','iPhone XR','iPhone 11','iPhone 12','iPhone 13','iPhone 14','iPhone 15'],'iPhone':['7','8','X','XR','XS','11','12','13','14','15'],'Xiaomi':['Redmi 9A','Redmi 10','Redmi 12','Redmi 13C','Redmi Note 10','Redmi Note 11','Redmi Note 12','Redmi Note 13','Poco X3','Poco X5','Poco F5','Mi 11','12T','13T'],'Redmi':['9A','9C','10C','12','12C','13C','Note 9','Note 10','Note 11','Note 12','Note 13'],'Poco':['X3 Pro','X4 Pro','X5','X6','M5','F5'],'Huawei':['Y6','Y7','Y9','P20 Lite','P30 Lite','Nova 3i','Nova 5T','Mate 20'],'Honor':['X6','X7','X8','X9','50 Lite','70','90'],'Nokia':['C21','C32','G10','G21','1.4'],'Realme':['C11','C25','C35','C55','8','9','10','11'],'Oppo':['A15','A17','A57','A58','Reno 6','Reno 8'],'Vivo':['Y12','Y20','Y21','Y33s','V21','V23'],'Motorola':['G Power','G13','G23','Edge 30'],'OnePlus':['Nord CE','Nord 2','9','10 Pro'],'Infinix':['Hot 10','Hot 20','Hot 30','Note 12','Smart 7'],'Tecno':['Spark 8','Spark 10','Camon 19'],'Sony':['Xperia 1','Xperia 5','Xperia 10'],'LG':['G6','G7','K50'],'Google Pixel':['4a','6','7','8'],'Asus':['Zenfone 8','ROG Phone 6'],'Lenovo':[],'ZTE':[],'Alcatel':[],'Itel':[],'TCL':[],'Nothing':['Phone (1)','Phone (2)']};
+  var items=[],meta={users:[],devices:[],audit:[],resetAt:0},me=null,devId='',flt=-1,editCode=null,editUid=null,tab='users';
+  var syncing=false,again=false,tm,dN=0,sN=0,syncedOnce=false,loginMsg='',lmode='';
   var $=function(i){return document.getElementById(i)};
-  function load(){try{items=JSON.parse(localStorage.getItem(KEY)||'[]')||[]}catch(e){items=[]}}
-  function persist(ns){try{localStorage.setItem(KEY,JSON.stringify(items));if(!ns)schedSync();return true}catch(e){alert('ذخیره‌سازی در این مرورگر کار نمی‌کند. همین الان پشتیبان‌گیری کنید.');return false}}
+  var ROLES={owner:'مدیر کل',admin:'مدیر',staff:'کارمند',tech:'تعمیرکار'};
+  function isOwner(){return !!me&&me.role==='owner'}
+  function isMgr(){return !!me&&(me.role==='owner'||me.role==='admin')}
+  function canEditUser(u){return isOwner()||(isMgr()&&(u.role==='staff'||u.role==='tech'))}
+  function ensureOwner(){if(!meta.users.length||meta.users.some(function(u){return u.role==='owner'}))return;var a=meta.users.filter(function(u){return u.role==='admin'&&u.active}).sort(function(x,y){return x.created-y.created})[0];if(a){a.role='owner';a.updated=Date.now();touch()}}
+
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function norm(s){return String(s||'').toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[۰-۹]/g,function(d){return d.charCodeAt(0)-1776}).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632})}
   function hl(text,terms){var t=esc(text);terms.forEach(function(w){if(!w)return;var re=new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');t=t.replace(re,'<mark>$1</mark>')});return t}
   function fdate(ts){try{return new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}catch(e){return new Date(ts).toLocaleString()}}
+  function rid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
   function digits(s){return norm(s).replace(/\D/g,'')}
   function money(el){var d=digits(el.value);el.value=d?Number(d).toLocaleString('en-US'):''}
   function fm(n){return Number(n).toLocaleString('fa-IR')}
-  var GH='repair-intake-gh',syncing=false,again=false,tm;
-  function schedSync(){clearTimeout(tm);tm=setTimeout(sync,700)}
-  function ghCfg(){try{return JSON.parse(localStorage.getItem(GH)||'null')}catch(e){return null}}
-  function setSt(t){$('syncst').textContent=t}
-  function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
-  function b64d(s){return decodeURIComponent(escape(atob(s.replace(/\s/g,''))))}
-  function mergeIn(arr){var map={};items.forEach(function(i){map[i.code]=i});arr.forEach(function(x){if(!x||!x.code)return;var o=map[x.code];if(!o||(x.updated||0)>(o.updated||0))map[x.code]=x});items=Object.keys(map).map(function(k){return map[k]})}
-  function sync(){
-    var c=ghCfg();if(!c||!c.token){setSt('');return}
-    if(syncing){again=true;return}
-    if(navigator.onLine===false){setSt('آفلاین: با وصل شدن اینترنت همگام می‌شود');return}
-    syncing=true;setSt('در حال همگام‌سازی...');
-    var url='https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+c.path;
-    var H={'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json'};
-    fetch(url,{headers:H,cache:'no-store'}).then(function(r){
-      if(r.status===404)return {sha:null,arr:[]};
-      if(!r.ok)throw new Error(r.status);
-      return r.json().then(function(j){var d=JSON.parse(b64d(j.content));return {sha:j.sha,arr:Array.isArray(d)?d:(d.items||[])}})
-    }).then(function(rem){
-      var rm={};rem.arr.forEach(function(x){if(x&&x.code)rm[x.code]=x});
-      mergeIn(rem.arr);persist(true);render();
-      var diff=!rem.sha||items.length!==Object.keys(rm).length||items.some(function(i){var r=rm[i.code];return !r||(r.updated||0)!==(i.updated||0)});
-      if(!diff)return;
-      var body={message:'update '+new Date().toISOString(),content:b64e(JSON.stringify({app:'repair-intake',v:1,items:items}))};if(rem.sha)body.sha=rem.sha;
-      return fetch(url,{method:'PUT',headers:H,body:JSON.stringify(body)}).then(function(r){if(!r.ok)throw new Error(r.status)})
-    }).then(function(){setSt('همگام‌سازی شد: '+fdate(Date.now()))}).catch(function(){setSt('همگام‌سازی نشد (اینترنت یا تنظیمات را بررسی کنید). اطلاعات روی این دستگاه سالم است.')}).then(function(){syncing=false;if(again){again=false;sync()}})
-  }
   function delivFor(rec,st,now){return st===3?{delivered:rec.delivered||now}:{delivered:null}}
+  function live(){return items.filter(function(i){return !i.deleted})}
   function newCode(){var A='ABCDEFGHJKMNPQRSTUVWXYZ23456789',c;do{c='';for(var i=0;i<5;i++)c+=A.charAt(Math.floor(Math.random()*A.length))}while(items.some(function(x){return x.code===c}));return c}
 
+  /* ---------- storage ---------- */
+  function load(){
+    try{items=JSON.parse(localStorage.getItem(K_I)||'[]')||[]}catch(e){items=[]}
+    try{var m=JSON.parse(localStorage.getItem(K_M)||'null');if(m)meta={users:m.users||[],devices:m.devices||[],audit:m.audit||[],resetAt:m.resetAt||0}}catch(e){}
+    try{devId=localStorage.getItem(K_D)||'';if(!devId){devId=rid();localStorage.setItem(K_D,devId)}}catch(e){devId=devId||rid()}
+  }
+  function save(){try{localStorage.setItem(K_I,JSON.stringify(items));localStorage.setItem(K_M,JSON.stringify(meta));return true}catch(e){alert('ذخیره‌سازی در این مرورگر کار نمی‌کند. همین الان پشتیبان‌گیری کنید.');return false}}
+  function touch(){var ok=save();dN++;schedSync();return ok}
+  function log(a,d){meta.audit.push({id:rid(),ts:Date.now(),user:me?me.username:'-',a:a,d:d||''});if(meta.audit.length>300)meta.audit=meta.audit.slice(-300)}
+
+  /* ---------- crypto / users / devices ---------- */
+  function hex(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}
+  function hashPw(pw,salt){
+    if(!window.crypto||!crypto.subtle)return Promise.reject(new Error('nosub'));
+    var enc=new TextEncoder();
+    return crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']).then(function(k){return crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:100000,hash:'SHA-256'},k,256)}).then(hex)
+  }
+  function mkUser(un,pw,role){var salt=rid()+rid();return hashPw(pw,salt).then(function(h){var now=Date.now();return {id:rid(),username:un,salt:salt,hash:h,role:role,active:true,created:now,updated:now}})}
+  function devName(){var u=navigator.userAgent,o=/Android/.test(u)?'Android':/iPhone|iPad/.test(u)?'iOS':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':/Linux/.test(u)?'Linux':'?';var b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox/.test(u)?'Firefox':/Chrome/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'?';return o+' / '+b}
+  function thisDev(){return meta.devices.filter(function(x){return x.id===devId})[0]}
+  function regDevice(){var now=Date.now(),d=thisDev();if(!d)meta.devices.push({id:devId,name:devName(),user:me.id,username:me.username,first:now,lastSeen:now,revoked:false,updated:now});else{d.user=me.id;d.username=me.username;d.lastSeen=now;d.updated=now}}
+  function setSes(u){try{localStorage.setItem(K_S,JSON.stringify({uid:u.id}))}catch(e){}}
+  function checkSession(){
+    var s=null;try{s=JSON.parse(localStorage.getItem(K_S)||'null')}catch(e){}
+    var u=s&&meta.users.filter(function(x){return x.id===s.uid})[0],dv=thisDev();
+    if(u&&u.active&&!(dv&&dv.revoked)){me=u;return true}
+    if(s){try{localStorage.removeItem(K_S)}catch(e){}loginMsg=(dv&&dv.revoked)?'این دستگاه توسط مدیر قطع شد.':'دسترسی این حساب غیرفعال شده است.'}
+    me=null;return false
+  }
+  function touchSeen(){var d=thisDev();if(!d||!me)return;if(Date.now()-(d.lastSeen||0)>6e5){d.lastSeen=Date.now();d.updated=d.lastSeen;touch()}}
+
+  /* ---------- gate: login or app ---------- */
+  function gate(){
+    ensureOwner();var ok=checkSession();
+    if(!ok||!isMgr()){if($('adm').open)$('adm').close()}
+    $('app').hidden=!ok;$('login').hidden=ok;
+    if(ok){lmode='';$('who').textContent=me.username+' ('+(ROLES[me.role]||me.role)+')';$('adm-open').hidden=!isMgr();$('add').hidden=me.role==='tech';render();touchSeen()}
+    else renderLogin(false)
+  }
+  function lmodeNow(){if(meta.users.length)return 'login';var c=ghCfg();return (c&&c.token&&!syncedOnce)?'wait':'setup'}
+  function renderLogin(force){
+    var m=lmodeNow();if(m===lmode&&!force&&!loginMsg)return;lmode=m;var h='';
+    var u='<label for="l-u">نام کاربری</label><input id="l-u" dir="ltr" style="text-align:left" autocomplete="username" autocapitalize="none">';
+    if(m==='login')h='<div style="font-weight:800">ورود</div>'+u+'<label for="l-p">رمز عبور</label><input id="l-p" type="password" dir="ltr" style="text-align:left" autocomplete="current-password"><div class="err" id="l-err"></div><button class="btn" id="l-go">ورود</button>';
+    else if(m==='setup')h='<div style="font-weight:800">ساخت حساب مدیر کل</div><div class="meta">اولین بار است. برای مدیر کل نام کاربری و رمز بسازید. این حساب به همه‌چیز دسترسی دارد.</div>'+u+'<label for="l-p">رمز عبور (حداقل ۶ کاراکتر)</label><input id="l-p" type="password" dir="ltr" style="text-align:left" autocomplete="new-password"><label for="l-p2">تکرار رمز</label><input id="l-p2" type="password" dir="ltr" style="text-align:left" autocomplete="new-password"><div class="err" id="l-err"></div><button class="btn" id="l-setup">ساخت حساب و ورود</button>';
+    else h='<div>در حال دریافت حساب‌ها از GitHub...</div><div class="err" id="l-err"></div><button class="btn alt" id="l-retry">تلاش دوباره</button>';
+    $('lbox').innerHTML=h;
+    if(loginMsg&&$('l-err')){$('l-err').textContent=loginMsg;loginMsg=''}
+  }
+  function lerr(t){var e=$('l-err');if(e)e.textContent=t}
+  function doLogin(){
+    var un=norm($('l-u').value).trim(),pw=$('l-p').value;
+    var u=meta.users.filter(function(x){return x.username===un})[0],dv=thisDev();
+    if(dv&&dv.revoked){lerr('این دستگاه توسط مدیر قطع شده است.');return}
+    if(!u||!u.active){lerr('نام کاربری یا رمز اشتباه است.');return}
+    hashPw(pw,u.salt).then(function(h){
+      if(h!==u.hash){lerr('نام کاربری یا رمز اشتباه است.');return}
+      me=u;setSes(u);regDevice();log('ورود','');touch();lmode='';gate()
+    }).catch(function(){lerr('این مرورگر از رمزنگاری پشتیبانی نمی‌کند. سایت را با https باز کنید.')})
+  }
+  function doSetup(){
+    var un=norm($('l-u').value).trim(),p=$('l-p').value,p2=$('l-p2').value;
+    if(un.length<3||/\s/.test(un)){lerr('نام کاربری حداقل ۳ حرف و بدون فاصله باشد.');return}
+    if(p.length<6){lerr('رمز حداقل ۶ کاراکتر باشد.');return}
+    if(p!==p2){lerr('تکرار رمز یکی نیست.');return}
+    mkUser(un,p,'owner').then(function(u){meta.users.push(u);me=u;setSes(u);regDevice();log('ساخت حساب مدیر کل',un);touch();lmode='';gate()}).catch(function(){lerr('این مرورگر از رمزنگاری پشتیبانی نمی‌کند. سایت را با https باز کنید.')})
+  }
+  $('lbox').onclick=function(e){var id=e.target.id;if(id==='l-go')doLogin();else if(id==='l-setup')doSetup();else if(id==='l-retry')sync()};
+  $('lbox').onkeydown=function(e){if(e.key==='Enter'){var b=$('l-go')||$('l-setup');if(b)b.click()}};
+  $('logout').onclick=function(){try{localStorage.removeItem(K_S)}catch(e){}me=null;lmode='';gate()};
+
+  /* ---------- items list ---------- */
   function renderFilters(){
-    var h='<button class="f'+(flt<0?' on':'')+'" data-f="-1">همه ('+items.length+')</button>';
-    ST.forEach(function(s,i){var n=items.filter(function(x){return x.status===i}).length;h+='<button class="f'+(flt===i?' on':'')+'" data-f="'+i+'">'+s+' ('+n+')</button>'});
+    var L=live(),h='<button class="f'+(flt<0?' on':'')+'" data-f="-1">همه ('+L.length+')</button>';
+    ST.forEach(function(s,i){var n=L.filter(function(x){return x.status===i}).length;h+='<button class="f'+(flt===i?' on':'')+'" data-f="'+i+'">'+s+' ('+n+')</button>'});
     $('filters').innerHTML=h
   }
   function renderBackupBanner(){
     var last=0;try{last=+localStorage.getItem(BK)||0}catch(e){}
     var old=!last||(Date.now()-last>7*864e5);
-    $('bk').innerHTML=(items.length&&old)?'<div class="banner"><span>'+(last?'بیشتر از ۷ روز از آخرین پشتیبان‌گیری گذشته.':'هنوز پشتیبان‌گیری نکرده‌اید.')+'</span><button class="link" id="bknow">الان پشتیبان بگیر</button></div>':''
+    $('bk').innerHTML=(isOwner()&&live().length&&old)?'<div class="banner"><span>'+(last?'بیشتر از ۷ روز از آخرین پشتیبان‌گیری گذشته.':'هنوز پشتیبان‌گیری نکرده‌اید.')+'</span><button class="link" id="bknow">الان پشتیبان بگیر</button></div>':''
   }
   function render(){
     renderFilters();renderBackupBanner();
-    var terms=norm($('q').value).split(/\s+/).filter(Boolean);
-    var res=items.filter(function(it){
+    var isS=!!me&&me.role==='staff',L=live().filter(function(i){return !isS||i.by===me.username}),isA=isMgr(),terms=norm($('q').value).split(/\s+/).filter(Boolean);$('filters').hidden=isS;
+    var res=L.filter(function(it){
       if(flt>=0&&it.status!==flt)return false;
-      var h=norm([it.code,it.phone,it.model,it.owner,it.mobile,it.problem].join(' '));
+      var h=norm([it.code,it.phone,it.model,it.owner,isS?'':it.mobile,it.problem].join(' '));
       return terms.every(function(w){return h.indexOf(w)>-1})
     }).sort(function(a,b){return b.created-a.created});
-    $('count').textContent=items.length?res.length+' مورد':'';
-    if(!res.length){$('list').innerHTML='<div class="empty">'+(items.length?'چیزی پیدا نشد.':'هنوز گوشی‌ای ثبت نشده. روی «ثبت گوشی» بزنید.')+'</div>';return}
+    $('count').textContent=L.length?res.length+' مورد':'';
+    if(!res.length){$('list').innerHTML='<div class="empty">'+(L.length?'چیزی پیدا نشد.':'هنوز گوشی‌ای ثبت نشده. روی «ثبت گوشی» بزنید.')+'</div>';return}
     $('list').innerHTML=res.map(function(it){
+      if(isS)return '<div class="item"><div class="top"><div><div class="name">'+hl(it.phone+' '+it.model,terms)+'</div><div class="meta">'+hl(it.owner,terms)+'</div></div><div class="code">'+hl(it.code,terms)+'</div></div>'+(it.problem?'<div class="prob">'+hl(it.problem,terms)+'</div>':'')+'</div>';
       var opts=ST.map(function(s,i){return '<option value="'+i+'"'+(it.status===i?' selected':'')+'>'+s+'</option>'}).join('');
       return '<div class="item"><div class="top"><div><div class="name">'+hl(it.phone+' '+it.model,terms)+'</div><div class="meta">'+hl(it.owner,terms)+(it.mobile?' - <span dir="ltr">'+hl(it.mobile,terms)+'</span>':'')+'</div></div><div class="code">'+hl(it.code,terms)+'</div></div>'+
       (it.problem?'<div class="prob">'+hl(it.problem,terms)+'</div>':'')+(it.pass?'<div class="meta">رمز: <span dir="ltr">'+esc(it.pass)+'</span></div>':'')+
       (it.cost||it.dep?'<div class="meta">'+[it.cost?'هزینه '+fm(it.cost):'',it.dep?'بیعانه '+fm(it.dep):'',it.cost?'باقی‌مانده '+fm(Math.max(0,it.cost-(it.dep||0))):''].filter(Boolean).join(' | ')+' تومان</div>':'')+
-      '<div class="row2"><select class="st st'+(it.status+1)+'" data-s="'+it.code+'" aria-label="وضعیت">'+opts+'</select><span class="date">ثبت: '+fdate(it.created)+'</span></div>'+(it.delivered?'<div class="date">تحویل: '+fdate(it.delivered)+'</div>':'')+
-      '<div class="acts"><button class="link" data-e="'+it.code+'">ویرایش</button></div></div>'
+      '<div class="row2"><select class="st st'+(it.status+1)+'" data-s="'+it.code+'" aria-label="وضعیت">'+opts+'</select><span class="date">ثبت: '+fdate(it.created)+(it.by?' - '+esc(it.by):'')+'</span></div>'+(it.delivered?'<div class="date">تحویل: '+fdate(it.delivered)+'</div>':'')+
+      '<div class="acts"><button class="link" data-e="'+it.code+'">ویرایش</button>'+(isA?'<button class="link del" data-x="'+it.code+'">حذف</button>':'')+'</div></div>'
     }).join('')
   }
-  var BR={'Samsung':['Galaxy A03','A04','A05','A14','A15','A24','A25','A34','A35','A54','A55','S21','S22','S23','S24','J7','Note 10','Note 20'],'Apple':['iPhone 7','iPhone 8','iPhone X','iPhone XR','iPhone 11','iPhone 12','iPhone 13','iPhone 14','iPhone 15'],'iPhone':['7','8','X','XR','XS','11','12','13','14','15'],'Xiaomi':['Redmi 9A','Redmi 10','Redmi 12','Redmi 13C','Redmi Note 10','Redmi Note 11','Redmi Note 12','Redmi Note 13','Poco X3','Poco X5','Poco F5','Mi 11','12T','13T'],'Redmi':['9A','9C','10C','12','12C','13C','Note 9','Note 10','Note 11','Note 12','Note 13'],'Poco':['X3 Pro','X4 Pro','X5','X6','M5','F5'],'Huawei':['Y6','Y7','Y9','P20 Lite','P30 Lite','Nova 3i','Nova 5T','Mate 20'],'Honor':['X6','X7','X8','X9','50 Lite','70','90'],'Nokia':['C21','C32','G10','G21','1.4'],'Realme':['C11','C25','C35','C55','8','9','10','11'],'Oppo':['A15','A17','A57','A58','Reno 6','Reno 8'],'Vivo':['Y12','Y20','Y21','Y33s','V21','V23'],'Motorola':['G Power','G13','G23','Edge 30'],'OnePlus':['Nord CE','Nord 2','9','10 Pro'],'Infinix':['Hot 10','Hot 20','Hot 30','Note 12','Smart 7'],'Tecno':['Spark 8','Spark 10','Camon 19'],'Sony':['Xperia 1','Xperia 5','Xperia 10'],'LG':['G6','G7','K50'],'Google Pixel':['4a','6','7','8'],'Asus':['Zenfone 8','ROG Phone 6'],'Lenovo':[],'ZTE':[],'Alcatel':[],'Itel':[],'TCL':[],'Nothing':['Phone (1)','Phone (2)']};
   function fillSug(){
     var cur=norm($('f-phone').value).trim(),names={},models={};
     Object.keys(BR).forEach(function(k){names[k]=1;if(cur&&norm(k).indexOf(cur)===0)BR[k].forEach(function(m){models[m]=1})});
@@ -199,9 +289,11 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
   function openDlg(it){
     editCode=it?it.code:null;$('err').textContent='';
     $('dt').textContent=it?'ویرایش - کد '+it.code:'ثبت گوشی جدید';
-    $('f-phone').value=it?it.phone:'';$('f-model').value=it?it.model:'';$('f-owner').value=it?it.owner:'';$('f-mobile').value=it?it.mobile:'';$('f-prob').value=it?it.problem:'';$('f-pass').value=it&&it.pass?it.pass:'';$('f-cost').value=it&&it.cost?Number(it.cost).toLocaleString('en-US'):'';$('f-dep').value=it&&it.dep?Number(it.dep).toLocaleString('en-US'):'';
+    $('f-phone').value=it?it.phone:'';$('f-model').value=it?it.model:'';$('f-owner').value=it?it.owner:'';$('f-mobile').value=it?it.mobile:'';$('f-prob').value=it?it.problem:'';$('f-pass').value=it&&it.pass?it.pass:'';
+    $('f-cost').value=it&&it.cost?Number(it.cost).toLocaleString('en-US'):'';$('f-dep').value=it&&it.dep?Number(it.dep).toLocaleString('en-US'):'';
     $('f-status').innerHTML=ST.map(function(s,i){return '<option value="'+i+'">'+s+'</option>'}).join('');
     $('f-status').value=it?it.status:0;
+    var sl=document.querySelector('label[for="f-status"]'),hs=!!me&&me.role==='staff';sl.hidden=hs;$('f-status').hidden=hs;
     fillSug();$('dlg').showModal();$('f-phone').focus()
   }
   $('add').onclick=function(){openDlg(null)};
@@ -211,37 +303,172 @@ mark{background:#ffd54a;color:#000;border-radius:3px;padding:0 2px}
     var phone=$('f-phone').value.trim(),owner=$('f-owner').value.trim();
     if(!phone||!owner){$('err').textContent='اسم گوشی و اسم صاحب گوشی را وارد کنید.';return}
     var now=Date.now(),vals={phone:phone,model:$('f-model').value.trim(),owner:owner,mobile:norm($('f-mobile').value).trim(),problem:$('f-prob').value.trim(),pass:$('f-pass').value.trim(),cost:digits($('f-cost').value),dep:digits($('f-dep').value),status:+$('f-status').value,updated:now};
-    if(editCode){items=items.map(function(i){return i.code===editCode?Object.assign({},i,vals,delivFor(i,vals.status,now)):i});persist();$('dlg').close();render()}
-    else{vals.code=newCode();vals.created=now;Object.assign(vals,delivFor({},vals.status,now));items.push(vals);
-      if(persist()){$('dlg').close();$('newcode').textContent=vals.code;$('done').showModal();render()}}
+    if(editCode){items=items.map(function(i){return i.code===editCode?Object.assign({},i,vals,delivFor(i,vals.status,now)):i});touch();$('dlg').close();render()}
+    else{vals.code=newCode();vals.created=now;vals.by=me?me.username:'';Object.assign(vals,delivFor({},vals.status,now));items.push(vals);
+      if(touch()){$('dlg').close();$('newcode').textContent=vals.code;$('done').showModal();render()}}
   };
   $('copy').onclick=function(){var c=$('newcode').textContent;try{navigator.clipboard.writeText(c);this.textContent='کپی شد'}catch(e){}};
   $('close2').onclick=function(){$('done').close();$('copy').textContent='کپی کد'};
-  $('list').onclick=function(e){var t=e.target;if(t.dataset.e)openDlg(items.filter(function(i){return i.code===t.dataset.e})[0])};
-  $('list').onchange=function(e){var t=e.target;if(t.dataset.s){var now=Date.now();items=items.map(function(i){return i.code===t.dataset.s?Object.assign({},i,{status:+t.value,updated:now},delivFor(i,+t.value,now)):i});persist();render()}};
+  $('list').onclick=function(e){
+    var t=e.target;
+    if(t.dataset.e&&me&&me.role!=='staff')openDlg(items.filter(function(i){return i.code===t.dataset.e})[0]);
+    if(t.dataset.x&&isMgr()){var it=items.filter(function(i){return i.code===t.dataset.x})[0];
+      if(it&&confirm('این رکورد حذف شود؟ (در پنل مدیریت، بخش حذف‌شده‌ها قابل بازگردانی است)')){it.deleted=true;it.updated=Date.now();log('حذف رکورد',it.code+' '+it.phone+' '+it.model);touch();render()}}
+  };
+  $('list').onchange=function(e){var t=e.target;if(t.dataset.s&&me&&me.role!=='staff'){var now=Date.now();items=items.map(function(i){return i.code===t.dataset.s?Object.assign({},i,{status:+t.value,updated:now},delivFor(i,+t.value,now)):i});touch();render()}};
   $('filters').onclick=function(e){var f=e.target.dataset.f;if(f!==undefined){flt=+f;render()}};
   $('q').oninput=render;
+
+  /* ---------- admin panel ---------- */
+  function admRender(){
+    if(!$('adm').open)return;
+    var T=[['users','کاربران'],['devs','دستگاه‌ها'],['trash','حذف‌شده‌ها'],['log','گزارش'],['set','تنظیمات']].filter(function(t){return t[0]!=='set'||isOwner()}),h='';if(tab==='set'&&!isOwner())tab='users';
+    $('adm-tabs').innerHTML=T.map(function(t){return '<button class="f'+(tab===t[0]?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</button>'}).join('');
+    if(tab==='users'){
+      h='<button class="btn" data-nu="1">+ کاربر جدید</button>'+meta.users.slice().sort(function(a,b){return a.created-b.created}).map(function(u){
+        return '<div class="item"><div class="top"><div class="name">'+esc(u.username)+'</div><div><span class="chip2">'+(ROLES[u.role]||u.role)+'</span><span class="chip2 '+(u.active?'ok':'off')+'">'+(u.active?'فعال':'غیرفعال')+'</span></div></div><div class="acts">'+(canEditUser(u)?'<button class="link" data-eu="'+u.id+'">ویرایش / تغییر رمز</button>':'')+'</div></div>'}).join('')
+    }else if(tab==='devs'){
+      h=meta.devices.length?meta.devices.slice().sort(function(a,b){return (b.lastSeen||0)-(a.lastSeen||0)}).map(function(d){
+        return '<div class="item"><div class="top"><div><div class="name">'+esc(d.name)+(d.id===devId?' (این دستگاه)':'')+'</div><div class="meta">'+esc(d.username||'')+' - آخرین فعالیت: '+fdate(d.lastSeen||d.first)+'</div></div><span class="chip2 '+(d.revoked?'off':'ok')+'">'+(d.revoked?'قطع شده':'مجاز')+'</span></div><div class="acts"><button class="link'+(d.revoked?'':' del')+'" data-rv="'+d.id+'">'+(d.revoked?'وصل کردن دوباره':'قطع دسترسی')+'</button><button class="link" data-rn="'+d.id+'">تغییر نام</button></div></div>'}).join(''):'<div class="empty">دستگاهی ثبت نشده.</div>'
+    }else if(tab==='trash'){
+      var D=items.filter(function(i){return i.deleted});
+      h=D.length?D.map(function(it){return '<div class="item"><div class="top"><div><div class="name">'+esc(it.phone+' '+it.model)+'</div><div class="meta">'+esc(it.owner)+'</div></div><div class="code">'+esc(it.code)+'</div></div><div class="acts"><button class="link" data-rs="'+it.code+'">بازگردانی</button></div></div>'}).join(''):'<div class="empty">چیزی حذف نشده.</div>'
+    }else if(tab==='log'){
+      h=meta.audit.length?meta.audit.slice().reverse().slice(0,80).map(function(a){return '<div class="item"><div class="name" style="font-size:.95rem">'+esc(a.a)+' <span class="meta">'+esc(a.user)+'</span></div><div class="meta">'+esc(a.d)+'</div><div class="date">'+fdate(a.ts)+'</div></div>'}).join(''):'<div class="empty">هنوز گزارشی نیست.</div>'
+    }else{
+      h='<div class="item"><div class="name">همگام‌سازی GitHub</div><div class="acts"><button class="btn alt" data-gh="1">تنظیمات GitHub</button></div></div>'+
+      '<div class="item"><div class="name">پشتیبان‌گیری</div><div class="acts"><button class="btn alt" data-bk="1">ذخیره فایل پشتیبان</button><button class="btn alt" data-rt="1">بازیابی از فایل</button></div></div>'+
+      '<div class="item"><div class="name off">ریست کامل</div><div class="meta">همه لیست‌ها پاک می‌شود، دستگاه‌های کارمندها قطع می‌شود و حساب کارمندها غیرفعال می‌شود. حساب مدیر کل می‌ماند. مدیرها و بقیه حساب‌ها هم غیرفعال می‌شوند. برگشت ندارد.</div><div class="acts"><button class="btn danger" data-rst="1">ریست کامل سایت</button></div></div>'
+    }
+    $('adm-body').innerHTML=h
+  }
+  $('adm-open').onclick=function(){tab='users';$('adm').showModal();admRender()};
+  $('adm').onclick=function(e){
+    var t=e.target,d=t.dataset;
+    if(d.t){tab=d.t;admRender()}
+    else if(d.nu)openUd(null);
+    else if(d.eu)openUd(d.eu);
+    else if(d.rv)toggleDev(d.rv);
+    else if(d.rn)renDev(d.rn);
+    else if(d.rs)restore(d.rs);
+    else if(d.gh)openGh();
+    else if(d.bk)doBackup();
+    else if(d.rt)$('file').click();
+    else if(d.rst)doReset();
+    else if(t.id==='adm-close')$('adm').close()
+  };
+  function openUd(id){
+    editUid=id;var u=id?meta.users.filter(function(x){return x.id===id})[0]:null;
+    $('ud-t').textContent=u?'ویرایش کاربر':'کاربر جدید';
+    $('u-name').value=u?u.username:'';$('u-pass').value='';$('u-pl').textContent=u?'رمز جدید (فقط اگر می‌خواهید عوض شود)':'رمز عبور (حداقل ۶ کاراکتر)';
+    var RO=[['staff','کارمند: فقط ثبت گوشی (فقط کد، اسم گوشی، صاحب و مشکل را می‌بیند)'],['tech','تعمیرکار: فقط ویرایش و تغییر وضعیت']];if(isOwner()){RO.push(['admin','مدیر: پنل مدیریت، حذف رکورد، ساخت کارمند']);RO.push(['owner','مدیر کل: همه‌چیز'])}$('u-role').innerHTML=RO.map(function(r){return '<option value="'+r[0]+'">'+r[1]+'</option>'}).join('');$('u-role').value=u?u.role:'staff';$('u-act').checked=u?u.active:true;$('u-err').textContent='';$('ud').showModal()
+  }
+  $('u-cancel').onclick=function(){$('ud').close()};
+  $('u-save').onclick=function(){
+    var un=norm($('u-name').value).trim(),pw=$('u-pass').value,role=$('u-role').value,act=$('u-act').checked;
+    var u=editUid?meta.users.filter(function(x){return x.id===editUid})[0]:null;
+    function er(t){$('u-err').textContent=t}
+    if(un.length<3||/\s/.test(un)){er('نام کاربری حداقل ۳ حرف و بدون فاصله باشد.');return}
+    if(meta.users.some(function(x){return x.username===un&&x!==u})){er('این نام کاربری قبلاً هست.');return}
+    if((!u||pw)&&pw.length<6){er('رمز حداقل ۶ کاراکتر باشد.');return}
+    if(u&&!canEditUser(u)){er('اجازه ویرایش این حساب را ندارید.');return}
+    if(!isOwner()&&(role==='owner'||role==='admin')){er('فقط مدیر کل می‌تواند مدیر بسازد.');return}
+    var owners=meta.users.filter(function(x){return x.role==='owner'&&x.active&&x!==u}).length+((role==='owner'&&act)?1:0);
+    if(owners<1){er('حداقل یک مدیر کل فعال باید باقی بماند.');return}
+    var now=Date.now(),fail=function(){er('این مرورگر از رمزنگاری پشتیبانی نمی‌کند. سایت را با https باز کنید.')};
+    if(u){
+      var s=rid()+rid(),p=pw?hashPw(pw,s):Promise.resolve(null);
+      p.then(function(h){u.username=un;u.role=role;u.active=act;u.updated=now;if(h){u.salt=s;u.hash=h}log('ویرایش کاربر',un+(h?' (رمز عوض شد)':''));touch();$('ud').close();gate();admRender()}).catch(fail)
+    }else mkUser(un,pw,role).then(function(nu){nu.active=act;meta.users.push(nu);log('ساخت کاربر',un);touch();$('ud').close();admRender()}).catch(fail)
+  };
+  function toggleDev(id){
+    var d=meta.devices.filter(function(x){return x.id===id})[0];if(!d)return;
+    if(id===devId){alert('دستگاه فعلی را نمی‌توانید قطع کنید.');return}
+    var du=meta.users.filter(function(x){return x.id===d.user})[0];if(du&&du.role==='owner'&&!isOwner()){alert('فقط مدیر کل می‌تواند دستگاه مدیر کل را قطع کند.');return}d.revoked=!d.revoked;d.updated=Date.now();log(d.revoked?'قطع دستگاه':'وصل دستگاه',d.name+' - '+(d.username||''));touch();admRender()
+  }
+  function renDev(id){var d=meta.devices.filter(function(x){return x.id===id})[0];if(!d)return;var n=prompt('نام دستگاه',d.name);if(n&&n.trim()){d.name=n.trim();d.updated=Date.now();touch();admRender()}}
+  function restore(code){var it=items.filter(function(i){return i.code===code})[0];if(!it)return;it.deleted=false;it.updated=Date.now();log('بازگردانی رکورد',it.code+' '+it.phone);touch();render();admRender()}
+  function doReset(){
+    if(!isOwner())return;
+    if(prompt('برای ریست کامل کلمه ریست را بنویسید.\nهمه لیست‌ها پاک و دستگاه‌ها و حساب‌های کارمندها قطع می‌شود.')!=='ریست')return;
+    var now=Date.now();items=[];meta.resetAt=now;
+    meta.devices.forEach(function(d){var u=meta.users.filter(function(x){return x.id===d.user})[0];if(d.id!==devId&&!d.revoked&&!(u&&u.role==='owner')){d.revoked=true;d.updated=now}});
+    meta.users.forEach(function(u){if(u.role!=='owner'&&u.active){u.active=false;u.updated=now}});
+    log('ریست کامل','');touch();render();admRender()
+  }
+
+  /* ---------- backup ---------- */
+  function payload(){return {app:'repair-intake',v:2,resetAt:meta.resetAt,items:items,users:meta.users,devices:meta.devices,audit:meta.audit}}
   function doBackup(){
-    var b=new Blob([JSON.stringify({app:'repair-intake',v:1,items:items},null,1)],{type:'application/json'});
+    var b=new Blob([JSON.stringify(payload(),null,1)],{type:'application/json'});
     var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='repair-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
     try{localStorage.setItem(BK,String(Date.now()))}catch(e){}renderBackupBanner()
   }
-  $('exp').onclick=doBackup;
-  $('setb').onclick=function(){var c=ghCfg()||{};$('g-owner').value=c.owner||'';$('g-repo').value=c.repo||'';$('g-path').value=c.path||'data.json';$('g-token').value=c.token||'';$('g-err').textContent='';$('gh').showModal()};
-  $('g-close').onclick=function(){$('gh').close()};
-  $('g-save').onclick=function(){var o=$('g-owner').value.trim(),r=$('g-repo').value.trim(),p=$('g-path').value.trim()||'data.json',t=$('g-token').value.trim();if(!o||!r||!t){$('g-err').textContent='همه فیلدها را پر کنید.';return}try{localStorage.setItem(GH,JSON.stringify({owner:o,repo:r,path:p,token:t}))}catch(e){}$('gh').close();sync()};
-  window.addEventListener('online',sync);
   document.addEventListener('click',function(e){if(e.target.id==='bknow')doBackup()});
-  $('imp').onclick=function(){$('file').click()};
   $('file').onchange=function(){
     var f=this.files[0];if(!f)return;var r=new FileReader();
-    r.onload=function(){try{var d=JSON.parse(r.result);var arr=Array.isArray(d)?d:d.items;if(!Array.isArray(arr))throw 0;
-      var map={};items.forEach(function(i){map[i.code]=i});var added=0;
-      arr.forEach(function(x){if(!x||!x.code)return;var o=map[x.code];if(!o){map[x.code]=x;added++}else if((x.updated||0)>(o.updated||0)){map[x.code]=x}});
-      items=Object.keys(map).map(function(k){return map[k]});persist();render();alert('بازیابی شد. '+added+' مورد جدید اضافه شد (موارد موجود حذف نمی‌شوند).')}catch(e){alert('فایل معتبر نیست.')}};
+    r.onload=function(){try{var d=JSON.parse(r.result);if(Array.isArray(d))d={items:d};if(!d||typeof d!=='object')throw 0;
+      var before=items.length;mergeAll(d);touch();gate();admRender();alert('بازیابی شد. موارد موجود حذف نمی‌شوند.')}catch(e){alert('فایل معتبر نیست.')}};
     r.readAsText(f);this.value=''
   };
-  load();render();sync();
+
+  /* ---------- github sync ---------- */
+  function schedSync(){clearTimeout(tm);tm=setTimeout(sync,700)}
+  function ghCfg(){try{return JSON.parse(localStorage.getItem(GH)||'null')}catch(e){return null}}
+  function setSt(t){$('syncst').textContent=t}
+  function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
+  function b64d(s){return decodeURIComponent(escape(atob(s.replace(/\s/g,''))))}
+  function mergeList(loc,rem,key,floor){
+    var m={};loc.forEach(function(x){m[x[key]]=x});
+    (rem||[]).forEach(function(x){if(!x||!x[key])return;var tv=x.updated||x.ts||x.created||0;if(floor&&tv<floor)return;var o=m[x[key]];if(!o||tv>(o.updated||o.ts||o.created||0))m[x[key]]=x});
+    return Object.keys(m).map(function(k){return m[k]})
+  }
+  function mergeAll(d){
+    var ra=+d.resetAt||0;
+    if(ra>meta.resetAt){meta.resetAt=ra;items=[]}
+    items=mergeList(items,d.items,'code',meta.resetAt);
+    meta.users=mergeList(meta.users,d.users,'id',0);
+    meta.devices=mergeList(meta.devices,d.devices,'id',0);
+    meta.audit=mergeList(meta.audit,d.audit,'id',0).sort(function(a,b){return a.ts-b.ts}).slice(-300)
+  }
+  function differs(d){
+    if((+d.resetAt||0)!==meta.resetAt)return true;
+    return [['items','code'],['users','id'],['devices','id'],['audit','id']].some(function(p){
+      var a=p[0]==='items'?items:meta[p[0]],r={};(d[p[0]]||[]).forEach(function(x){if(x)r[x[p[1]]]=x});
+      return a.length!==Object.keys(r).length||a.some(function(x){var y=r[x[p[1]]];return !y||(x.updated||x.ts||0)!==(y.updated||y.ts||0)})
+    })
+  }
+  function sync(){
+    var c=ghCfg();if(!c||!c.token)return;
+    if(syncing){again=true;return}
+    if(navigator.onLine===false){setSt('آفلاین: با وصل شدن اینترنت همگام می‌شود');return}
+    syncing=true;setSt('در حال همگام‌سازی...');
+    var url='https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+c.path;
+    var H={'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json'};
+    fetch(url,{headers:H,cache:'no-store'}).then(function(r){
+      if(r.status===404)return {sha:null,d:{}};
+      if(!r.ok)throw new Error(r.status);
+      return r.json().then(function(j){var d=JSON.parse(b64d(j.content));if(Array.isArray(d))d={items:d};return {sha:j.sha,d:d||{}}})
+    }).then(function(rem){
+      mergeAll(rem.d);save();syncedOnce=true;gate();admRender();
+      var pushed=dN;
+      if(rem.sha&&dN<=sN&&!differs(rem.d))return;
+      var body={message:'update '+new Date().toISOString(),content:b64e(JSON.stringify(payload()))};if(rem.sha)body.sha=rem.sha;
+      return fetch(url,{method:'PUT',headers:H,body:JSON.stringify(body)}).then(function(r){if(!r.ok)throw new Error(r.status);sN=pushed})
+    }).then(function(){setSt('همگام‌سازی شد: '+fdate(Date.now()))}).catch(function(){setSt('همگام‌سازی نشد (اینترنت یا تنظیمات را بررسی کنید). اطلاعات روی این دستگاه سالم است.');lerr('اتصال به GitHub برقرار نشد.')}).then(function(){syncing=false;if(again){again=false;sync()}})
+  }
+  function openGh(){var c=ghCfg()||{};$('g-owner').value=c.owner||'';$('g-repo').value=c.repo||'';$('g-path').value=c.path||'data.json';$('g-token').value=c.token||'';$('g-err').textContent='';$('gh').showModal()}
+  $('l-gh').onclick=openGh;
+  $('g-close').onclick=function(){$('gh').close()};
+  $('g-save').onclick=function(){
+    var o=$('g-owner').value.trim(),r=$('g-repo').value.trim(),p=$('g-path').value.trim()||'data.json',t=$('g-token').value.trim();
+    if(!o||!r||!t){$('g-err').textContent='همه فیلدها را پر کنید.';return}
+    try{localStorage.setItem(GH,JSON.stringify({owner:o,repo:r,path:p,token:t}))}catch(e){}
+    $('gh').close();syncedOnce=false;lmode='';gate();sync()
+  };
+  window.addEventListener('online',sync);
+
+  load();gate();sync();
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 })();
 </script>
